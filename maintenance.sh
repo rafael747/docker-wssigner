@@ -4,7 +4,7 @@
 
 while true
 do
-	sleep 2m
+	sleep $SLEEP_TIME
 
 	echo "[Maintenance] Checking ws-signer process..."
 
@@ -14,7 +14,7 @@ do
 		kcpu=$(echo $pid | awk '{print $1}')
     		kpid=$(echo $pid | awk '{print $2}')
     		kcom=$(echo $pid | awk '{print $3}')
-		kkill=$(echo $kcpu 90|awk '{if ($1 > $2) print 1; else print 0}')
+		kkill=$(echo $kcpu $CPU_TO_KILL|awk '{if ($1 > $2) print 1; else print 0}')
     
 		if [ $kkill -eq "1" ]
 		then
