@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://esec.com.br/mcc/ra" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RegistryAuthorityService" targetNamespace="http://esec.com.br/mcc/ra">
+  <wsdl:types>
+    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://esec.com.br/mcc/ra">
+  <xs:complexType name="CSRStatusReqType">
+    <xs:sequence/>
+    <xs:attribute name="CertificateRequestId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="CSRStatusRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="CSR" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StatusType">
+    <xs:sequence>
+      <xs:element name="StatusCode" type="xs:int"/>
+      <xs:element minOccurs="0" name="StatusMessage" type="xs:string"/>
+      <xs:element minOccurs="0" name="StatusDetail" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ReSendCSRReqType">
+    <xs:sequence/>
+    <xs:attribute name="CertificateRequestId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="CSRRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+    </xs:sequence>
+    <xs:attribute name="CertificateRequestId" type="xs:long" use="required"/>
+    <xs:attribute name="PIN" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="CertificateIssuedType">
+    <xs:sequence/>
+    <xs:attribute name="Certificate" type="xs:base64Binary" use="required"/>
+    <xs:attribute name="CertificateRequestId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="StatusRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FindUserReqType">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MobileUserType">
+    <xs:sequence/>
+    <xs:attribute name="UniqueIdentifier" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="CSRReqType">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="KeyType" type="tns:AsymmetricCipherType" use="required"/>
+    <xs:attribute name="CaId" type="xs:long"/>
+  </xs:complexType>
+  <xs:complexType name="CertificateRevokedType">
+    <xs:sequence/>
+    <xs:attribute name="Serial" type="xs:string" use="required"/>
+    <xs:attribute name="IssuerDN" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="RegisterPersonType">
+    <xs:sequence/>
+    <xs:attribute name="Certificate" type="xs:base64Binary" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="FindUserRespType">
+    <xs:sequence>
+      <xs:element name="UserInfo">
+        <xs:complexType>
+          <xs:sequence/>
+          <xs:attribute name="Name" type="xs:string" use="required"/>
+          <xs:attribute name="CPF" type="xs:string"/>
+          <xs:attribute name="Email" type="xs:string"/>
+          <xs:attribute name="BirthDate" type="xs:date" use="required"/>
+          <xs:attribute name="Rg" type="xs:string"/>
+          <xs:attribute name="OrganEmitterOfRg" type="xs:string"/>
+          <xs:attribute name="UfOfRg" type="tns:UFType"/>
+          <xs:attribute name="VoterRegistrationCard" type="xs:string"/>
+          <xs:attribute name="Address" type="xs:string"/>
+          <xs:attribute name="ZipCode" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Status" type="tns:UserStatusType"/>
+  </xs:complexType>
+  <xs:complexType name="CSRStatusRespTypeV2">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="CSR" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="AdditionalServiceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="dummy"/>
+      <xs:enumeration value="offlineSignature"/>
+      <xs:enumeration value="aetDriver"/>
+      <xs:enumeration value="kaspersky"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AsymmetricCipherType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RSA2048"/>
+      <xs:enumeration value="ECC256"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UFType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AC"/>
+      <xs:enumeration value="AL"/>
+      <xs:enumeration value="AM"/>
+      <xs:enumeration value="AP"/>
+      <xs:enumeration value="BA"/>
+      <xs:enumeration value="CE"/>
+      <xs:enumeration value="DF"/>
+      <xs:enumeration value="ES"/>
+      <xs:enumeration value="GO"/>
+      <xs:enumeration value="MA"/>
+      <xs:enumeration value="MG"/>
+      <xs:enumeration value="MS"/>
+      <xs:enumeration value="MT"/>
+      <xs:enumeration value="PA"/>
+      <xs:enumeration value="PB"/>
+      <xs:enumeration value="PE"/>
+      <xs:enumeration value="PI"/>
+      <xs:enumeration value="PR"/>
+      <xs:enumeration value="RJ"/>
+      <xs:enumeration value="RN"/>
+      <xs:enumeration value="RO"/>
+      <xs:enumeration value="RR"/>
+      <xs:enumeration value="RS"/>
+      <xs:enumeration value="SC"/>
+      <xs:enumeration value="SE"/>
+      <xs:enumeration value="SP"/>
+      <xs:enumeration value="TO"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UserStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NEW_USER"/>
+      <xs:enumeration value="OLD_USER"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="FaultDetail" nillable="true" type="tns:StatusType"/>
+  <xs:element name="CSRStatusReq" nillable="true" type="tns:CSRStatusReqType"/>
+  <xs:element name="CSRStatusResp" nillable="true" type="tns:CSRStatusRespType"/>
+  <xs:element name="ReSendCSRReqType" nillable="true" type="tns:ReSendCSRReqType"/>
+  <xs:element name="CSRResp" nillable="true" type="tns:CSRRespType"/>
+  <xs:element name="CertificateIssuedReq" nillable="true" type="tns:CertificateIssuedType"/>
+  <xs:element name="CertificateIssuedResp" nillable="true" type="tns:StatusRespType"/>
+  <xs:element name="ReIssueCertificatesReq" nillable="true" type="tns:FindUserReqType"/>
+  <xs:element name="ReIssueCertificatesResp" nillable="true" type="tns:StatusRespType"/>
+  <xs:element name="CSRReq" nillable="true" type="tns:CSRReqType"/>
+  <xs:element name="CertificateRevokedReq" nillable="true" type="tns:CertificateRevokedType"/>
+  <xs:element name="CertificateRevokedResp" nillable="true" type="tns:StatusRespType"/>
+  <xs:element name="RegisterPersonReq" nillable="true" type="tns:RegisterPersonType"/>
+  <xs:element name="RegisterPersonResp" nillable="true" type="tns:StatusRespType"/>
+  <xs:element name="FindUserReq" nillable="true" type="tns:FindUserReqType"/>
+  <xs:element name="FindUserResp" nillable="true" type="tns:FindUserRespType"/>
+  <xs:element name="CSRStatusReqV2" nillable="true" type="tns:CSRStatusReqType"/>
+  <xs:element name="CSRStatusRespV2" nillable="true" type="tns:CSRStatusRespTypeV2"/>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="CSRStatusQueryV2">
+    <wsdl:part element="tns:CSRStatusReqV2" name="CSRStatusReqV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="RegisterPersonResponse">
+    <wsdl:part element="tns:RegisterPersonResp" name="RegisterPersonResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CSRStatusQuery">
+    <wsdl:part element="tns:CSRStatusReq" name="CSRStatusReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ReIssueCertificatesResponse">
+    <wsdl:part element="tns:ReIssueCertificatesResp" name="ReIssueCertificatesResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ReIssueCertificates">
+    <wsdl:part element="tns:ReIssueCertificatesReq" name="ReIssueCertificatesReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CertificateIssuedResponse">
+    <wsdl:part element="tns:CertificateIssuedResp" name="CertificateIssuedResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CSRStatusQueryV2Response">
+    <wsdl:part element="tns:CSRStatusRespV2" name="CSRStatusRespV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="RevokedCertificate">
+    <wsdl:part element="tns:CertificateRevokedReq" name="CertificateRevokedReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CSRStatusQueryResponse">
+    <wsdl:part element="tns:CSRStatusResp" name="CSRStatusResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ReSendCSRRequest">
+    <wsdl:part element="tns:ReSendCSRReqType" name="ReSendCSRReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ICPMException">
+    <wsdl:part element="tns:FaultDetail" name="ICPMException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="RegisterPerson">
+    <wsdl:part element="tns:RegisterPersonReq" name="RegisterPersonReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="RevokedCertificateResponse">
+    <wsdl:part element="tns:CertificateRevokedResp" name="CertificateRevokedResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindUserResponse">
+    <wsdl:part element="tns:FindUserResp" name="FindUserResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CSRRequest">
+    <wsdl:part element="tns:CSRReq" name="CSRReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CertificateIssued">
+    <wsdl:part element="tns:CertificateIssuedReq" name="CertificateIssuedReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ReSendCSRRequestResponse">
+    <wsdl:part element="tns:CSRResp" name="CSRResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindUser">
+    <wsdl:part element="tns:FindUserReq" name="FindUserReq">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CSRRequestResponse">
+    <wsdl:part element="tns:CSRResp" name="CSRResp">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="RegistryAuthorityPortType">
+    <wsdl:operation name="CSRStatusQuery">
+      <wsdl:input message="tns:CSRStatusQuery" name="CSRStatusQuery">
+    </wsdl:input>
+      <wsdl:output message="tns:CSRStatusQueryResponse" name="CSRStatusQueryResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ReSendCSRRequest">
+      <wsdl:input message="tns:ReSendCSRRequest" name="ReSendCSRRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:ReSendCSRRequestResponse" name="ReSendCSRRequestResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="CertificateIssued">
+      <wsdl:input message="tns:CertificateIssued" name="CertificateIssued">
+    </wsdl:input>
+      <wsdl:output message="tns:CertificateIssuedResponse" name="CertificateIssuedResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ReIssueCertificates">
+      <wsdl:input message="tns:ReIssueCertificates" name="ReIssueCertificates">
+    </wsdl:input>
+      <wsdl:output message="tns:ReIssueCertificatesResponse" name="ReIssueCertificatesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CSRRequest">
+      <wsdl:input message="tns:CSRRequest" name="CSRRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:CSRRequestResponse" name="CSRRequestResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="RevokedCertificate">
+      <wsdl:input message="tns:RevokedCertificate" name="RevokedCertificate">
+    </wsdl:input>
+      <wsdl:output message="tns:RevokedCertificateResponse" name="RevokedCertificateResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterPerson">
+      <wsdl:input message="tns:RegisterPerson" name="RegisterPerson">
+    </wsdl:input>
+      <wsdl:output message="tns:RegisterPersonResponse" name="RegisterPersonResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FindUser">
+      <wsdl:input message="tns:FindUser" name="FindUser">
+    </wsdl:input>
+      <wsdl:output message="tns:FindUserResponse" name="FindUserResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="CSRStatusQueryV2">
+      <wsdl:input message="tns:CSRStatusQueryV2" name="CSRStatusQueryV2">
+    </wsdl:input>
+      <wsdl:output message="tns:CSRStatusQueryV2Response" name="CSRStatusQueryV2Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="RegistryAuthorityServiceSoapBinding" type="tns:RegistryAuthorityPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="CSRStatusQuery">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="CSRStatusQuery">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="CSRStatusQueryResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ReSendCSRRequest">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ReSendCSRRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ReSendCSRRequestResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="CertificateIssued">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="CertificateIssued">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="CertificateIssuedResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ReIssueCertificates">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ReIssueCertificates">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ReIssueCertificatesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CSRRequest">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="CSRRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="CSRRequestResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="RevokedCertificate">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="RevokedCertificate">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="RevokedCertificateResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterPerson">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="RegisterPerson">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="RegisterPersonResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FindUser">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="FindUser">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="FindUserResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="CSRStatusQueryV2">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="CSRStatusQueryV2">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="CSRStatusQueryV2Response">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="RegistryAuthorityService">
+    <wsdl:port binding="tns:RegistryAuthorityServiceSoapBinding" name="RegistryAuthorityPortType">
+      <soap:address location="http://localhost:8280/mcc/RegistryAuthorityService/RegistryAuthorityEndpointBean"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	targetNamespace="http://www.esec.com.br"
+	xmlns:ns="http://www.esec.com.br"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" >
+	
+	<xs:element name="config">
+	
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="certificates" type="ns:certificates">
+					<xs:annotation>
+						<xs:documentation>Define the user and servers certificates</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="servers" type="ns:servers">
+					<xs:annotation>
+						<xs:documentation>Define the known servers, including the WS-Signer itself</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="redirects" type="ns:redirects">
+					<xs:annotation>
+						<xs:documentation>Define the redirects to remote Web Services</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+		
+		<xs:key name="server-name">
+			<xs:selector xpath="ns:servers/ns:remote-server" />
+			<xs:field xpath="@name" />
+		</xs:key>
+		
+		<xs:keyref name="soap-ref" refer="ns:server-name">
+			<xs:selector xpath="ns:redirects/ns:soap-redirect" />
+			<xs:field xpath="@to" />
+		</xs:keyref>
+		
+		<xs:keyref name="rest-ref" refer="ns:server-name">
+			<xs:selector xpath="ns:redirects/ns:rest-redirect" />
+			<xs:field xpath="@to" />
+		</xs:keyref>
+		
+	</xs:element>
+	
+	<xs:complexType name="certificates">
+		<xs:sequence>
+			<xs:element name="signing-certificate" type="ns:signing-certificate">
+				<xs:annotation>
+					<xs:documentation>The certificate used to sign the requests</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="trusted-certificate" type="ns:trusted-certificate" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Full certificate chain of the trusted servers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="signing-certificate">
+		<xs:all>
+			<xs:element name="keystore-file" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Path to the file containing the key to use to sign the requests</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="keystore-type">
+				<xs:annotation>
+					<xs:documentation>The keystore type: PKCS12 (*.p12 , *.pfx) or JKS (*.jks)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="PKCS12" />
+						<xs:enumeration value="JKS" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="key-alias" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>The alias for key the inside the keystore</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	
+	<xs:complexType name="trusted-certificate">
+		<xs:all>
+			<xs:element name="certificate-file" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Path to the file containing the public certificate</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="certificate-type">
+				<xs:annotation>
+					<xs:documentation>The certificate type: PEM (*.pem , *.cer) or DER (*.der , *.crt)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="PEM" />
+						<xs:enumeration value="DER" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	
+	<xs:complexType name="servers">
+		<xs:sequence>
+			<xs:element name="local-server" type="ns:local-server">
+				<xs:annotation>
+					<xs:documentation>Configurations of the WS-Signer</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remote-server" type="ns:remote-server" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Configurations of remote servers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="local-server">
+		<xs:sequence>
+			<xs:element name="host-name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of this host, as visible by clients</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="port-number" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>TCP port, as visible by clients</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bind-number" type="xs:integer" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						If you are behind a reverse proxy, write the public visible port (the proxy's
+						port) at port-number and the port to listen at localhost in this element
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="remote-server">
+		<xs:sequence>
+			<xs:element name="protocol" type="xs:string" />
+			<xs:element name="host-name" type="xs:string" />
+			<xs:element name="port-number" type="xs:integer" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="redirects">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="soap-redirect" type="ns:soap-redirect">
+					<xs:annotation>
+						<xs:documentation>
+							Each soap-redirect adds a service in the WS-Signer that sign and
+							redirect requests to a remote server
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="rest-redirect" type="ns:rest-redirect">
+					<xs:annotation>
+						<xs:documentation>
+							Each rest-redirect adds a service in the WS-Signer that access a 
+							resource in a remote server using HTTP Client Authentication
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="soap-redirect">
+		<xs:all>
+			<xs:element name="wsdl-url" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Relative URL of the WSDL in the remote server</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="namespace-uri" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>XML Namespace where to find the service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="service-name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the service (inside de namespace)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="endpoint-name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the endpoint (inside de namespace)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="local-url" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Relative URL of the corresponding service in the WS-Signer</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="to" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>To which remote server the requests will be redirected</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<xs:complexType name="rest-redirect">
+		<xs:all>
+			<xs:element name="resource-url" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Relative URL of the resource in the remote server</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="local-url" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Relative URL of the corresponding service in the WS-Signer</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="file-size" type="xs:integer" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						The maximum size of the upload file in bytes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="to" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>To which remote server the requests will be redirected</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+</xs:schema>

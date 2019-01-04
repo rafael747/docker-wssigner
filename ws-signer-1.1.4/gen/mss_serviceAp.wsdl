@@ -1,0 +1,1085 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://esec.com.br/mss/ap" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="SignatureService" targetNamespace="http://esec.com.br/mss/ap">
+  <wsdl:types>
+    <xs:schema xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://esec.com.br/mss/ap">
+  <xs:import namespace="http://www.w3.org/2005/05/xmlmime"/>
+  <xs:element name="AlgorithmFilterType" type="tns:AlgorithmFilterType"/>
+  <xs:element name="DateType" type="tns:DateType"/>
+  <xs:element name="DoubleType" type="tns:DoubleType"/>
+  <xs:element name="ForceHardwareFilterType" type="tns:ForceHardwareFilterType"/>
+  <xs:element name="HsmCertificateFilterType" type="tns:HsmCertificateFilterType"/>
+  <xs:element name="IntegerType" type="tns:IntegerType"/>
+  <xs:element name="OwnerFilterType" type="tns:OwnerFilterType"/>
+  <xs:element name="StringType" type="tns:StringType"/>
+  <xs:element name="TrustChainFilterType" type="tns:TrustChainFilterType"/>
+  <xs:element name="certificateFiltersType" type="tns:CertificateFiltersType"/>
+  <xs:complexType name="ValidatePdfReqType">
+    <xs:sequence>
+      <xs:element name="Signature" type="xs:base64Binary" xmime:expectedContentTypes="application/pdf"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ValidateRespType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Error" type="tns:ValidationErrorType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Signatures" type="tns:SignatureInfoType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SignatureInfoType">
+    <xs:sequence>
+      <xs:element name="Valid" type="xs:boolean"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="InvalidReason" type="tns:SignatureErrorType"/>
+      <xs:element minOccurs="0" name="SigningTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="SignerCertificate" type="tns:CertificateInfoType"/>
+      <xs:element minOccurs="0" name="PolicyId" type="xs:string"/>
+      <xs:element minOccurs="0" name="PolicyUrl" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CertificateInfoType">
+    <xs:sequence>
+      <xs:element name="serialNumber" type="xs:integer"/>
+      <xs:element name="subjectDn" type="xs:string"/>
+      <xs:element name="issuerDn" type="xs:string"/>
+      <xs:element name="notBefore" type="xs:dateTime"/>
+      <xs:element name="notAfter" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="IssuerCertificate" type="tns:CertificateInfoType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StatusType">
+    <xs:sequence>
+      <xs:element name="StatusCode" type="xs:int"/>
+      <xs:element minOccurs="0" name="StatusMessage" type="xs:string"/>
+      <xs:element minOccurs="0" name="StatusDetail" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SignatureStatusReqType">
+    <xs:sequence/>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureStatusRespTypeV2">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusTypeV2"/>
+      <xs:element minOccurs="0" name="Signature" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="SignatureInfo" type="tns:SignatureInfoTypeV2"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StatusTypeV2">
+    <xs:sequence>
+      <xs:element name="StatusCode" type="xs:int"/>
+      <xs:element minOccurs="0" name="StatusMessage" type="xs:string"/>
+      <xs:element minOccurs="0" name="StatusDetail" type="xs:string"/>
+      <xs:element minOccurs="0" name="MobileStatus" type="tns:mobileStatus"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SignatureInfoTypeV2">
+    <xs:sequence>
+      <xs:element name="Valid" type="xs:boolean"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="InvalidReason" type="tns:SignatureErrorType"/>
+      <xs:element minOccurs="0" name="SigningTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="SignerCertificate" type="tns:CertificateInfoType"/>
+      <xs:element minOccurs="0" name="PolicyId" type="xs:string"/>
+      <xs:element minOccurs="0" name="PolicyUrl" type="xs:string"/>
+      <xs:element minOccurs="0" name="LegalIdentifier" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SimpleSignatureReqTypeV3">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element name="DataToBeSigned" type="xs:string"/>
+      <xs:element minOccurs="0" name="Fingerprint" type="xs:string"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="SignatureStandard" type="tns:SignatureStandardType"/>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+    <xs:attribute name="ApId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="MobileUserType">
+    <xs:sequence/>
+    <xs:attribute name="UniqueIdentifier" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="CertificateFiltersType">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element name="TrustChain" type="tns:TrustChainFilterType"/>
+        <xs:element name="OwnerCertificate" type="tns:OwnerFilterType"/>
+        <xs:element name="Algorithm" type="tns:AlgorithmFilterType"/>
+        <xs:element name="ForceHardware" type="tns:ForceHardwareFilterType"/>
+        <xs:element name="HsmCertificate" type="tns:HsmCertificateFilterType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TrustChainFilterType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="tns:TrustChain" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="OwnerFilterType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="tns:OwnerType" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="AlgorithmFilterType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="tns:SignatureModeType" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ForceHardwareFilterType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="HsmCertificateFilterType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SimpleSignatureRespTypeV3">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="VerificationCode" type="xs:int"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SimpleSignatureReqTypeV2">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element name="DataToBeSigned" type="xs:string"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="SignatureStandard" type="tns:SignatureStandardType"/>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+    <xs:attribute name="ApId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SimpleSignatureRespTypeV2">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="VerificationCode" type="xs:int"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="BandwidthInfoType">
+    <xs:sequence>
+      <xs:element name="TotalBandwidth" type="xs:long"/>
+      <xs:element name="UsedBandwidth" type="xs:long"/>
+      <xs:element name="DateToRenew" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureStatusRespTypeV2">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusTypeV2"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="DocumentSignatureStatus" type="tns:DocumentSignatureStatusInfoTypeV3"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DocumentSignatureStatusInfoTypeV3">
+    <xs:sequence>
+      <xs:element name="DocumentName" type="xs:string"/>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="Signature" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="SignatureInfo" type="tns:SignatureInfoTypeV2"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ValidateReqType">
+    <xs:sequence>
+      <xs:element name="Signature" type="xs:base64Binary" xmime:expectedContentTypes="application/pkcs7"/>
+      <xs:element minOccurs="0" name="Content" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ValidateRespTypeV2">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Error" type="tns:ValidationErrorType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Signatures" type="tns:SignatureInfoTypeV2"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureTIDsRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="DocumentSignatureStatus" type="tns:DocumentSignatureStatusInfoType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DocumentSignatureStatusInfoType">
+    <xs:sequence>
+      <xs:element name="DocumentName" type="xs:string"/>
+      <xs:element name="Status" type="tns:StatusType"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureComplexDocumentReqType">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element name="ContentType" type="xs:string"/>
+      <xs:element name="DataToBeDisplayed" type="xs:string"/>
+      <xs:element name="DataToBeSigned" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="SignatureStandard" type="tns:SignatureStandardType"/>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="Signature" type="xs:base64Binary"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureTemplateReqType">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element name="TemplateToBeSigned" type="tns:TemplateType"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="ApId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="TemplateType">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element ref="tns:DateType"/>
+        <xs:element ref="tns:DoubleType"/>
+        <xs:element ref="tns:IntegerType"/>
+        <xs:element ref="tns:StringType"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="TemplateId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType abstract="true" name="templateDataType">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="DateType">
+    <xs:complexContent>
+      <xs:extension base="tns:templateDataType">
+        <xs:sequence/>
+        <xs:attribute name="Value" type="xs:dateTime" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DoubleType">
+    <xs:complexContent>
+      <xs:extension base="tns:templateDataType">
+        <xs:sequence/>
+        <xs:attribute name="Value" type="xs:double" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IntegerType">
+    <xs:complexContent>
+      <xs:extension base="tns:templateDataType">
+        <xs:sequence/>
+        <xs:attribute name="Value" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StringType">
+    <xs:complexContent>
+      <xs:extension base="tns:templateDataType">
+        <xs:sequence/>
+        <xs:attribute name="Value" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureReqTypeV2">
+    <xs:sequence>
+      <xs:element name="User" type="tns:UserType"/>
+      <xs:element name="DataToBeDisplayed" type="xs:string"/>
+      <xs:element minOccurs="0" name="Fingerprint" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" name="DocumentsToBeSigned" type="tns:BatchInfoType"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+    <xs:attribute name="SignatureStandard" type="tns:SignatureStandardType"/>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="ApId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="UserType">
+    <xs:sequence/>
+    <xs:attribute name="Identifier" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="BatchInfoType">
+    <xs:complexContent>
+      <xs:extension base="tns:HashDocumentInfoType">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="SignatureStandardOptions" type="tns:SignatureStandardOptionsType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HashDocumentInfoType">
+    <xs:sequence/>
+    <xs:attribute name="ContentType" type="xs:string" use="required"/>
+    <xs:attribute name="DocumentName" type="xs:string" use="required"/>
+    <xs:attribute name="Hash" type="xs:string" use="required"/>
+    <xs:attribute name="UrlToDocument" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureStandardOptionsType">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element name="ElementsId" type="tns:ElementsIdXmldsigOptionType"/>
+        <xs:element name="AttributeIdName" type="tns:AttributeIdNameXmldsigOptionType"/>
+        <xs:element name="ElementsName" type="tns:ElementsNameXmldsigOptionType"/>
+        <xs:element name="AddSubjectName" type="tns:AddSubjectNameXmldsigOptionType"/>
+        <xs:element name="AddKeyVal" type="tns:AddKeyValXmldsigOptionType"/>
+        <xs:element name="MultipleSignatures" type="tns:MultipleSignaturesXmldsigOptionType"/>
+        <xs:element name="TextOfPadesSignature" type="tns:SignatureTextPadesOptionType"/>
+        <xs:element name="PageOfPadesSignature" type="tns:SignaturePagePadesOptionType"/>
+        <xs:element name="PosXOfPadesSignature" type="tns:SignaturePosXPadesOptionType"/>
+        <xs:element name="PosYOfPadesSignature" type="tns:SignaturePosYPadesOptionType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ElementsIdXmldsigOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:list itemType="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="AttributeIdNameXmldsigOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ElementsNameXmldsigOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:list itemType="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="AddSubjectNameXmldsigOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="AddKeyValXmldsigOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="MultipleSignaturesXmldsigOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureTextPadesOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignaturePagePadesOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignaturePosXPadesOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignaturePosYPadesOptionType">
+    <xs:sequence/>
+    <xs:attribute name="value" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureRespTypeV2">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Signatures" type="tns:DocumentSignatureInfoType"/>
+      <xs:element minOccurs="0" name="VerificationCode" type="xs:int"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="DocumentSignatureInfoType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element name="DocumentName" type="xs:string"/>
+      <xs:element minOccurs="0" name="Signature" type="xs:base64Binary" xmime:expectedContentTypes="application/pkcs7"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureStatusRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="DocumentSignatureStatus" type="tns:DocumentSignatureStatusInfoTypeV2"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DocumentSignatureStatusInfoTypeV2">
+    <xs:sequence>
+      <xs:element name="DocumentName" type="xs:string"/>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="Signature" type="xs:base64Binary"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="FindSignatureReqType">
+    <xs:sequence/>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+    <xs:attribute name="Attached" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureStatusRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="Signature" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureComplexDocumentReqType">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element name="DataToBeDisplayed" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" name="DocumentsToBeSigned" type="tns:HashDocumentInfoType"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+    <xs:attribute name="SignatureStandard" type="tns:SignatureStandardType"/>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="ApId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureComplexDocumentRespType">
+    <xs:sequence>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Signatures" type="tns:DocumentSignatureInfoType"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SignatureSimpleDocumentReqType">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element name="DataToBeSigned" type="xs:string"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+    <xs:attribute name="ApId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="BatchSignatureReqType">
+    <xs:sequence>
+      <xs:element name="MobileUser" type="tns:MobileUserType"/>
+      <xs:element name="DataToBeDisplayed" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" name="DocumentsToBeSigned" type="tns:BatchInfoType"/>
+      <xs:element minOccurs="0" name="CertificateFilters" type="tns:CertificateFiltersType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalServices" type="tns:AdditionalServiceType"/>
+    </xs:sequence>
+    <xs:attribute name="TimeOut" type="xs:positiveInteger"/>
+    <xs:attribute name="MessagingMode" type="tns:MessagingModeType" use="required"/>
+    <xs:attribute name="TestMode" type="xs:boolean" use="required"/>
+    <xs:attribute name="SignatureStandard" type="tns:SignatureStandardType"/>
+    <xs:attribute name="SignaturePolicy" type="tns:SignaturePolicyType"/>
+    <xs:attribute name="ApId" type="xs:long" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="ValidationErrorType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TRANSPORT_ERROR"/>
+      <xs:enumeration value="ENCODING_ERROR"/>
+      <xs:enumeration value="INCOMPLETE_CERTIFICATE_CHAIN_ERROR"/>
+      <xs:enumeration value="INVALID_CERTIFICATE_CHAIN_ERROR"/>
+      <xs:enumeration value="UNSUPORTED_ALGORITHM_ERROR"/>
+      <xs:enumeration value="SIGNING_POLICY_VERIFICATION_ERROR"/>
+      <xs:enumeration value="CRYPTOGRAPHIC_ERROR"/>
+      <xs:enumeration value="UNEXPECTED_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SignatureErrorType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="INVALID_CERTIFICATE_ERROR"/>
+      <xs:enumeration value="SIGNING_POLICY_ERROR"/>
+      <xs:enumeration value="CERTIFICATE_REVOKED_ERROR"/>
+      <xs:enumeration value="INVALID_TIMESTAMP_ERROR"/>
+      <xs:enumeration value="WRONG_NUMBER_OF_ATTRIBUTES_ERROR"/>
+      <xs:enumeration value="UNKNOWN_ERROR"/>
+      <xs:enumeration value="NOT_BEFORE_ERROR"/>
+      <xs:enumeration value="NOT_AFTER_ERROR"/>
+      <xs:enumeration value="NOT_TRUSTED_CERTIFICATE_ERROR"/>
+      <xs:enumeration value="DIGEST_VERIFICATION_ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="mobileStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="UNREAD"/>
+      <xs:enumeration value="READ"/>
+      <xs:enumeration value="DONE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TrustChain">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ICPBR"/>
+      <xs:enumeration value="JUS"/>
+      <xs:enumeration value="RFB"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OwnerType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PERSON"/>
+      <xs:enumeration value="COMPANY"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SignatureModeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RSA"/>
+      <xs:enumeration value="ECC"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SignaturePolicyType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AD_RB"/>
+      <xs:enumeration value="AD_RT"/>
+      <xs:enumeration value="AD_RC"/>
+      <xs:enumeration value="AD_RV"/>
+      <xs:enumeration value="AD_RA"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AdditionalServiceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="dummy"/>
+      <xs:enumeration value="offlineSignature"/>
+      <xs:enumeration value="aetDriver"/>
+      <xs:enumeration value="kaspersky"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SignatureStandardType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cades"/>
+      <xs:enumeration value="adobepdf"/>
+      <xs:enumeration value="xades"/>
+      <xs:enumeration value="xmldsig_enveloped"/>
+      <xs:enumeration value="xmldsig_enveloping"/>
+      <xs:enumeration value="pades"/>
+      <xs:enumeration value="raw"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MessagingModeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="synch"/>
+      <xs:enumeration value="asynchClientServer"/>
+      <xs:enumeration value="asynchServerServer"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="FaultDetail" nillable="true" type="tns:StatusType"/>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="ValidatePdfResponse">
+    <wsdl:part name="ValidateResp" type="tns:ValidateRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureResponse">
+    <wsdl:part name="BatchSignatureComplexDocumentResp" type="tns:BatchSignatureComplexDocumentRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindSignature">
+    <wsdl:part name="FindSignatureReq" type="tns:FindSignatureReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureTIDsStatus">
+    <wsdl:part name="BatchSignatureStatusReq" type="tns:SignatureStatusReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureV2Response">
+    <wsdl:part name="BatchSignatureRespTypeV2" type="tns:BatchSignatureRespTypeV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindBandwidthInfoResponse">
+    <wsdl:part name="BandwidthInfoType" type="tns:BandwidthInfoType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureComplexDocumentResponse">
+    <wsdl:part name="BatchSignatureComplexDocumentResp" type="tns:BatchSignatureComplexDocumentRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateResponse">
+    <wsdl:part name="ValidateResp" type="tns:ValidateRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindBandwidthInfo">
+  </wsdl:message>
+  <wsdl:message name="StatusQueryResponse">
+    <wsdl:part name="SignatureStatusReq" type="tns:SignatureStatusRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureComplexDocument">
+    <wsdl:part name="BatchSignatureComplexDocumentReq" type="tns:BatchSignatureComplexDocumentReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SimpleSignatureV2Response">
+    <wsdl:part name="SimpleSignatureRespTypeV2" type="tns:SimpleSignatureRespTypeV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SignatureComplexDocumentResponse">
+    <wsdl:part name="SignatureResp" type="tns:SignatureRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StatusQueryV2Response">
+    <wsdl:part name="SignatureStatusRespV2" type="tns:SignatureStatusRespTypeV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureStatusV2">
+    <wsdl:part name="SignatureStatusReqType" type="tns:SignatureStatusReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="Validate">
+    <wsdl:part name="ValidateReq" type="tns:ValidateReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureStatusV3">
+    <wsdl:part name="SignatureStatusReqType" type="tns:SignatureStatusReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FindSignatureResponse">
+    <wsdl:part name="SignatureStatusReq" type="tns:SignatureStatusRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureTIDsStatusResponse">
+    <wsdl:part name="BatchSignatureResp" type="tns:BatchSignatureTIDsRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StatusQuery">
+    <wsdl:part name="SignatureStatusReq" type="tns:SignatureStatusReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ICPMException">
+    <wsdl:part element="tns:FaultDetail" name="ICPMException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SignatureComplexDocument">
+    <wsdl:part name="SignatureComplexDocumentReq" type="tns:SignatureComplexDocumentReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StatusQueryV2">
+    <wsdl:part name="SignatureStatusReq" type="tns:SignatureStatusReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SignatureByTemplateResponse">
+    <wsdl:part name="SignatureResp" type="tns:SignatureRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateV2">
+    <wsdl:part name="ValidateReq" type="tns:ValidateReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SignatureSimpleDocumentResponse">
+    <wsdl:part name="SignatureResp" type="tns:SignatureRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureStatusV2Response">
+    <wsdl:part name="BatchSignatureStatusRespType" type="tns:BatchSignatureStatusRespType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SimpleSignatureV3Response">
+    <wsdl:part name="SimpleSignatureRespTypeV3" type="tns:SimpleSignatureRespTypeV3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureStatusV3Response">
+    <wsdl:part name="BatchSignatureStatusRespTypeV2" type="tns:BatchSignatureStatusRespTypeV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignatureV2">
+    <wsdl:part name="BatchSignatureReqTypeV2" type="tns:BatchSignatureReqTypeV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SimpleSignatureV3">
+    <wsdl:part name="SimpleSignatureReqTypeV3" type="tns:SimpleSignatureReqTypeV3">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SimpleSignatureV2">
+    <wsdl:part name="SimpleSignatureReqTypeV2" type="tns:SimpleSignatureReqTypeV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SignatureByTemplate">
+    <wsdl:part name="SignatureTemplateReq" type="tns:SignatureTemplateReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SignatureSimpleDocument">
+    <wsdl:part name="SignatureSimpleDocumentReq" type="tns:SignatureSimpleDocumentReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidatePdf">
+    <wsdl:part name="ValidatePdfReq" type="tns:ValidatePdfReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="BatchSignature">
+    <wsdl:part name="BatchSignatureReq" type="tns:BatchSignatureReqType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateV2Response">
+    <wsdl:part name="ValidateRespV2" type="tns:ValidateRespTypeV2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="SignaturePortType">
+    <wsdl:operation name="ValidatePdf">
+      <wsdl:input message="tns:ValidatePdf" name="ValidatePdf">
+    </wsdl:input>
+      <wsdl:output message="tns:ValidatePdfResponse" name="ValidatePdfResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="StatusQueryV2">
+      <wsdl:input message="tns:StatusQueryV2" name="StatusQueryV2">
+    </wsdl:input>
+      <wsdl:output message="tns:StatusQueryV2Response" name="StatusQueryV2Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SimpleSignatureV3">
+      <wsdl:input message="tns:SimpleSignatureV3" name="SimpleSignatureV3">
+    </wsdl:input>
+      <wsdl:output message="tns:SimpleSignatureV3Response" name="SimpleSignatureV3Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SimpleSignatureV2">
+      <wsdl:input message="tns:SimpleSignatureV2" name="SimpleSignatureV2">
+    </wsdl:input>
+      <wsdl:output message="tns:SimpleSignatureV2Response" name="SimpleSignatureV2Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FindBandwidthInfo">
+      <wsdl:input message="tns:FindBandwidthInfo" name="FindBandwidthInfo">
+    </wsdl:input>
+      <wsdl:output message="tns:FindBandwidthInfoResponse" name="FindBandwidthInfoResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureStatusV3">
+      <wsdl:input message="tns:BatchSignatureStatusV3" name="BatchSignatureStatusV3">
+    </wsdl:input>
+      <wsdl:output message="tns:BatchSignatureStatusV3Response" name="BatchSignatureStatusV3Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateV2">
+      <wsdl:input message="tns:ValidateV2" name="ValidateV2">
+    </wsdl:input>
+      <wsdl:output message="tns:ValidateV2Response" name="ValidateV2Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureTIDsStatus">
+      <wsdl:input message="tns:BatchSignatureTIDsStatus" name="BatchSignatureTIDsStatus">
+    </wsdl:input>
+      <wsdl:output message="tns:BatchSignatureTIDsStatusResponse" name="BatchSignatureTIDsStatusResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SignatureComplexDocument">
+      <wsdl:input message="tns:SignatureComplexDocument" name="SignatureComplexDocument">
+    </wsdl:input>
+      <wsdl:output message="tns:SignatureComplexDocumentResponse" name="SignatureComplexDocumentResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SignatureByTemplate">
+      <wsdl:input message="tns:SignatureByTemplate" name="SignatureByTemplate">
+    </wsdl:input>
+      <wsdl:output message="tns:SignatureByTemplateResponse" name="SignatureByTemplateResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureV2">
+      <wsdl:input message="tns:BatchSignatureV2" name="BatchSignatureV2">
+    </wsdl:input>
+      <wsdl:output message="tns:BatchSignatureV2Response" name="BatchSignatureV2Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureStatusV2">
+      <wsdl:input message="tns:BatchSignatureStatusV2" name="BatchSignatureStatusV2">
+    </wsdl:input>
+      <wsdl:output message="tns:BatchSignatureStatusV2Response" name="BatchSignatureStatusV2Response">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FindSignature">
+      <wsdl:input message="tns:FindSignature" name="FindSignature">
+    </wsdl:input>
+      <wsdl:output message="tns:FindSignatureResponse" name="FindSignatureResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureComplexDocument">
+      <wsdl:input message="tns:BatchSignatureComplexDocument" name="BatchSignatureComplexDocument">
+    </wsdl:input>
+      <wsdl:output message="tns:BatchSignatureComplexDocumentResponse" name="BatchSignatureComplexDocumentResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="StatusQuery">
+      <wsdl:input message="tns:StatusQuery" name="StatusQuery">
+    </wsdl:input>
+      <wsdl:output message="tns:StatusQueryResponse" name="StatusQueryResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SignatureSimpleDocument">
+      <wsdl:input message="tns:SignatureSimpleDocument" name="SignatureSimpleDocument">
+    </wsdl:input>
+      <wsdl:output message="tns:SignatureSimpleDocumentResponse" name="SignatureSimpleDocumentResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Validate">
+      <wsdl:input message="tns:Validate" name="Validate">
+    </wsdl:input>
+      <wsdl:output message="tns:ValidateResponse" name="ValidateResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignature">
+      <wsdl:input message="tns:BatchSignature" name="BatchSignature">
+    </wsdl:input>
+      <wsdl:output message="tns:BatchSignatureResponse" name="BatchSignatureResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ICPMException" name="ICPMException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SignatureServiceSoapBinding" type="tns:SignaturePortType">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ValidatePdf">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="ValidatePdf">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ValidatePdfResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="StatusQueryV2">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="StatusQueryV2">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="StatusQueryV2Response">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SimpleSignatureV3">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="SimpleSignatureV3">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SimpleSignatureV3Response">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SimpleSignatureV2">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="SimpleSignatureV2">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SimpleSignatureV2Response">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FindBandwidthInfo">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="FindBandwidthInfo">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="FindBandwidthInfoResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureStatusV3">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="BatchSignatureStatusV3">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="BatchSignatureStatusV3Response">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureTIDsStatus">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="BatchSignatureTIDsStatus">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="BatchSignatureTIDsStatusResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateV2">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="ValidateV2">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ValidateV2Response">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SignatureComplexDocument">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="SignatureComplexDocument">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SignatureComplexDocumentResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SignatureByTemplate">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="SignatureByTemplate">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SignatureByTemplateResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureV2">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="BatchSignatureV2">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="BatchSignatureV2Response">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureStatusV2">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="BatchSignatureStatusV2">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="BatchSignatureStatusV2Response">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FindSignature">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="FindSignature">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="FindSignatureResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignatureComplexDocument">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="BatchSignatureComplexDocument">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="BatchSignatureComplexDocumentResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="StatusQuery">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="StatusQuery">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="StatusQueryResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SignatureSimpleDocument">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="SignatureSimpleDocument">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SignatureSimpleDocumentResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BatchSignature">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="BatchSignature">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="BatchSignatureResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Validate">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="Validate">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ValidateResponse">
+        <soap:body namespace="http://esec.com.br/mss/ap" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ICPMException">
+        <soap:fault name="ICPMException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SignatureService">
+    <wsdl:port binding="tns:SignatureServiceSoapBinding" name="SignaturePortType">
+      <soap:address location="http://localhost:8280/mss/serviceAp"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

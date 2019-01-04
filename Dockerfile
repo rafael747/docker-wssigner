@@ -10,6 +10,7 @@ FROM rafaelcarreira/docker-java8
 
 COPY entrypoint.sh /entrypoint.sh
 COPY maintenance.sh /maintenance.sh
+COPY wssigner /data/wssigner
 
 ENTRYPOINT ["/entrypoint.sh"]
 
