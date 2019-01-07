@@ -7,6 +7,7 @@
 [ -f "/run/secrets/CERT_PASS" ] && echo "/run/secrets/CERT_PASS secret/file...OK!" || { echo "ERRO: /run/secret/CERT_PASS secret/file not found!"; exit 1; }
 
 # link log file to stdout 
+mkdir -p /data/wssigner/log
 ln -sf /dev/stdout /data/wssigner/log/ws-signer.log
 
 # run maintenance script
