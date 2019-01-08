@@ -8,7 +8,9 @@
 
 # link log file to stdout 
 mkdir -p /data/wssigner/log
-ln -sf /dev/stdout /data/wssigner/log/ws-signer.log
+tail -F /data/wssigner/log/ws-signer.log &
+
+#ln -sf /dev/stdout /data/wssigner/log/ws-signer.log
 
 # run maintenance script
 /maintenance.sh &
